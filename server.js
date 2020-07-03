@@ -29,7 +29,8 @@ const userSchema = mongoose.Schema({
   log: [{
     description: { type: String, required: true },
     duration: { type: Number, required: true },
-    date: { type: String }
+    date: { type: String },
+    _id: false
   }]
 });
 
