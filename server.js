@@ -8,7 +8,7 @@ require('dotenv').config();
 
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/exercise-track',
-{ useUnifiedTopology: true, useNewUrlParser: true } );
+{ useUnifiedTopology: true, useNewUrlParser: true, useFindAndModify: false } );
 
 app.use(cors());
 
@@ -29,8 +29,7 @@ const userSchema = mongoose.Schema({
   log: [{
     description: { type: String, required: true },
     duration: { type: Number, required: true },
-    date: { type: String },
-    _id: false
+    date: { type: String }
   }]
 });
 
@@ -80,6 +79,7 @@ app.post('/api/exercise/add', (req, res) => {
   };
   User.findOneAndUpdate({_id: userId}, { $push: { log: newExercise }} ,(err, data) => {
     if (err) return console.error(err);
+    console.log(date)
     res.json({
       _id: data._id,
       username: data.username,
@@ -106,29 +106,28 @@ app.get('/api/exercise/log', (req, res) => {
       limit = parseInt(limit);
       if (!isNaN(limit)) {
         // if given a valid number for limit
-        data['log'] = data['log'].slice(0, limit - 1);
+        data['log'] = data['log'].slice(0, limit );
       }
     }
     if (from) {
       let fromDate = new Date(from);
       let logCopy = [...data['log']].filter(exercise => {
-        if (date in exercise) {
+
           let currDate = exercise['date'];
           return currDate > fromDate;
-        }
+        
       });
-      data['log'].clear();
+
       data['log'] = [...logCopy];
     }
     if (to) {
       let toDate = new Date(to);
       let logCopy = [...data['log']].filter(exercise => {
-        if (date in exercise) {
+
           let currDate = exercise['date'];
           return currDate < toDate;
-        }
+        
       });
-      data['log'].clear();
       data['log'] = [...logCopy];
     }
     res.json(data);
