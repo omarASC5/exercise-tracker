@@ -29,7 +29,8 @@ const userSchema = mongoose.Schema({
   log: [{
     description: { type: String, required: true },
     duration: { type: Number, required: true },
-    date: { type: String }
+    date: { type: String },
+    _id: false
   }]
 });
 
@@ -97,7 +98,7 @@ app.get('/api/exercise/log', (req, res) => {
     // required parameter
     res.status(400).send('userId parameter is missing');
   }
-  User.findOne({ _id: userId }, (err, data) => {
+  User.findById({ _id: userId }, (err, data) => {
     if (err) return console.error(err);
     data['userId'] = data['_id'];
     delete data['_id'];
@@ -105,29 +106,23 @@ app.get('/api/exercise/log', (req, res) => {
       limit = parseInt(limit);
       if (!isNaN(limit)) {
         // if given a valid number for limit
-        data['log'] = data['log'].slice(0, limit );
+        data['log'] = data['log'].slice(0, limit);
       }
     }
     data['_doc']['count'] = data.log.length;
     if (from) {
       let fromDate = new Date(from);
-      let logCopy = [...data['log']];
-      logCopy=logCopy.filter(exercise => {
-        
+      let logCopy = [...data['log']].filter(exercise => {
         let currDate = new Date(exercise['date']);
         return currDate > fromDate;
-        
       });
-      console.log(logCopy)
       data['log'] = [...logCopy];
     }
     if (to) {
       let toDate = new Date(to);
       let logCopy = [...data['log']].filter(exercise => {
-
           let currDate = new Date(exercise['date']);
           return currDate < toDate;
-        
       });
       data['log'] = [...logCopy];
     }
