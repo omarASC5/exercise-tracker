@@ -101,7 +101,6 @@ app.get('/api/exercise/log', (req, res) => {
     if (err) return console.error(err);
     data['userId'] = data['_id'];
     delete data['_id'];
-    data['_doc']['count'] = data.log.length;
     if (limit) {
       limit = parseInt(limit);
       if (!isNaN(limit)) {
@@ -109,27 +108,30 @@ app.get('/api/exercise/log', (req, res) => {
         data['log'] = data['log'].slice(0, limit );
       }
     }
+    data['_doc']['count'] = data.log.length;
     if (from) {
       let fromDate = new Date(from);
-      let logCopy = [...data['log']].filter(exercise => {
-
-          let currDate = exercise['date'];
-          return currDate > fromDate;
+      let logCopy = [...data['log']];
+      logCopy=logCopy.filter(exercise => {
+        
+        let currDate = new Date(exercise['date']);
+        return currDate > fromDate;
         
       });
-
+      console.log(logCopy)
       data['log'] = [...logCopy];
     }
     if (to) {
       let toDate = new Date(to);
       let logCopy = [...data['log']].filter(exercise => {
 
-          let currDate = exercise['date'];
+          let currDate = new Date(exercise['date']);
           return currDate < toDate;
         
       });
       data['log'] = [...logCopy];
     }
+    
     res.json(data);
   });
 });
@@ -161,3 +163,4 @@ app.use((err, req, res, next) => {
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 });
+// 5effcc848b816c30d8153418
