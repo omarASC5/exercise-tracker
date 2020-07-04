@@ -63,16 +63,24 @@ app.get('/api/exercise/users', (req, res) => {
 app.post('/api/exercise/add', (req, res) => {
   const { userId, description, duration } = req.body;
   let { date } = req.body;
-  if (!date) {
+
     // if date not supplied, add the current date
-    const currDate = new Date();
+    let currDate = "";
+    if (!date) {
+      currDate = new Date();
+    } else {
+      currDate = new Date(date);
+    }
+
     const year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currDate);    
     let month = '' + (currDate.getMonth() + 1);
     if (month.length < 2) 
       month = '0' + month;
     const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(currDate);
-    date = `${year}-${month}-${day}`;
-  }
+    const month2 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Nov', 'Dec'][currDate.getMonth()];
+    let weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][currDate.getDay()]
+    date = `${weekday} ${month2} ${day} ${year}`;
+  
   let newExercise = {
     description,
     duration: parseInt(duration),
