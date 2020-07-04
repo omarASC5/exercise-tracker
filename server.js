@@ -59,7 +59,7 @@ app.get('/api/exercise/users', (req, res) => {
 // @POST /api/exercise/add : 1). find user by _id
 // 2) add description, duration, and date field to user object in DB
 // 3). fill in the date with current date if not supplied
-// 4). return the user object
+// 4). return the user object, 5effc6d14a842708089aa48a
 app.post('/api/exercise/add', (req, res) => {
   const { userId, description, duration } = req.body;
   let { date } = req.body;
@@ -80,7 +80,13 @@ app.post('/api/exercise/add', (req, res) => {
   };
   User.findOneAndUpdate({_id: userId}, { $push: { log: newExercise }} ,(err, data) => {
     if (err) return console.error(err);
-    res.json(data);
+    res.json({
+      _id: data._id,
+      username: data.username,
+      date,
+      duration: parseInt(duration),
+      description: description
+    });
   });
 });
 
